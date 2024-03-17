@@ -21,7 +21,13 @@ async function queryDatabase(sql, params = []) {
 // API端点：获取标书信息列表
 router.get('/api/tenderIndex', async (req, res) => {
   try {
-    const sql = 'SELECT * FROM tender_index';
+    const sql = `
+      SELECT ti.* 
+      FROM tender_index ti
+      JOIN announcement_labels al ON ti.id = al.tender_id
+      WHERE al.type_id IN (1, 2)
+      ORDER BY ti.id DESC
+    `;
     const results = await queryDatabase(sql);
     res.json(results);
   } catch (error) {
