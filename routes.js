@@ -43,7 +43,7 @@ router.post('/api/login', async (req, res) => {
 
   try {
     const response = await axios.get(url);
-    const { openid, session_key } = response.data;
+    const { openid, session_key,company_id } = response.data;
     console.log('nickname before insert:', nickname);
     const userExists = await queryDatabase('SELECT * FROM users WHERE openid = ?', [openid]);
     if (userExists.length === 0) {
@@ -53,8 +53,9 @@ router.post('/api/login', async (req, res) => {
       // Update existing user with the new nickname
       await queryDatabase('UPDATE users SET nickname = ? WHERE openid = ?', [nickname, openid]);
       console.log('用户nickname已更新');
+      const company_id = await queryDatabase('SELECT company_id FROM users WHERE openid = ?', [openid]);
     }
-    res.send({ openid, session_key, nickname });
+    res.send({ openid, session_key, nickname,company_id });
   } catch (error) {
     console.error('登录失败', error);
     res.status(500).send('登录失败');
